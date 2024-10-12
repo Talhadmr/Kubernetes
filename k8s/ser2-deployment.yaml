@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: greeting-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: greeting
+  template:
+    metadata:
+      labels:
+        app: greeting
+    spec:
+      containers:
+      - name: greeting
+        image: myapp-greeting:latest  # Docker imaj adı
+        ports:
+        - containerPort: 3001
