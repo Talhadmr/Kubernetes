@@ -1,0 +1,57 @@
+Vagrant.configure("2") do |config|
+  
+    # Ortak ayarlar
+    config.vm.box = "ubuntu/jammy64"
+    config.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024"
+      vb.cpus = 1
+    end
+  
+    # SSH varsayılan kullanıcısını tdemir olarak ayarla
+    config.ssh.username = "tdemir"
+  
+    # Server Machine Configuration
+    config.vm.define "tdemirS" do |server|
+      server.vm.hostname = "tdemirS"
+      server.vm.network "private_network", ip: "192.168.56.110"
+  
+      server.vm.provision "shell", inline: <<-SHELL
+        # tdemir kullanıcısını oluştur
+        sudo useradd -m -s /bin/bash tdemir
+        echo "tdemir ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/tdemir
+  
+        # tdemir kullanıcısına şifre ver
+        echo "tdemir:crea" | sudo chpasswd
+  
+        # Vagrant varsayılan anahtarını tdemir kullanıcısına kopyala
+        sudo mkdir -p /home/tdemir/.ssh
+        sudo cp /home/vagrant/.ssh/authorized_keys /home/tdemir/.ssh/authorized_keys
+        sudo chown -R tdemir:tdemir /home/tdemir/.ssh
+        sudo chmod 700 /home/tdemir/.ssh
+        sudo chmod 600 /home/tdemir/.ssh/authorized_keys
+      SHELL
+    end
+  
+    # Server Worker Machine Configuration
+    config.vm.define "tdemirSW" do |serverworker|
+      serverworker.vm.hostname = "tdemirSW"
+      serverworker.vm.network "private_network", ip: "192.168.56.111"
+  
+      serverworker.vm.provision "shell", inline: <<-SHELL
+        # tdemir kullanıcısını oluştur
+        sudo useradd -m -s /bin/bash tdemir
+        echo "tdemir ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/tdemir
+  
+        # tdemir kullanıcısına şifre ver
+        echo "tdemir:crea" | sudo chpasswd
+  
+        # Vagrant varsayılan anahtarını tdemir kullanıcısına kopyala
+        sudo mkdir -p /home/tdemir/.ssh
+        sudo cp /home/vagrant/.ssh/authorized_keys /home/tdemir/.ssh/authorized_keys
+        sudo chown -R tdemir:tdemir /home/tdemir/.ssh
+        sudo chmod 700 /home/tdemir/.ssh
+        sudo chmod 600 /home/tdemir/.ssh/authorized_keys
+      SHELL
+    end
+  end
+  
