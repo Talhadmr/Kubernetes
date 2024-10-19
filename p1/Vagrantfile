@@ -6,54 +6,63 @@ Vagrant.configure("2") do |config|
     vb.cpus = 1
   end
 
-  # SSH ayarlarını kaldır
-  # config.ssh.username = "tdemir"
-
   # Server Machine Configuration
   config.vm.define "tdemirS" do |server|
     server.vm.hostname = "tdemirS"
 
-    # İlk ağ adaptörü NAT (enp0s3)
-    # İkinci ağ adaptörü private network (enp0s8)
+    # NAT interface
+    server.vm.network "forwarded_port", guest: 22, host: 2222, auto_correct: true
+
+    # Private network
     server.vm.network "private_network", ip: "192.168.56.110", auto_config: false, nic_type: "virtio", adapter: 2
 
+    # Provisioning
     server.vm.provision "shell", inline: <<-SHELL
-      # MAC adreslerini al
-      MAC_ENP0S3=$(cat /sys/class/net/enp0s3/address)
-      MAC_ENP0S8=$(cat /sys/class/net/enp0s8/address)
+      # Update and install necessary packages
+      sudo apt-get update
+      sudo apt-get install -y net-tools
 
-      # Netplan yapılandırma dosyası oluştur
-      sudo bash -c "cat > /etc/netplan/01-netcfg.yaml <<EOF
+      # Create user 'tdemir'
+      sudo useradd -m -s /bin/bash tdemir
+      echo "tdemir ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/tdemir
+      echo "tdemir:crea" | sudo chpasswd
+
+      # Setup SSH for 'tdemir'
+      sudo mkdir -p /home/tdemir/.ssh
+      sudo cp /home/vagrant/.ssh/authorized_keys /home/tdemir/.ssh/authorized_keys
+      sudo chown -R tdemir:tdemir /home/tdemir/.ssh
+      sudo chmod 700 /home/tdemir/.ssh
+      sudo chmod 600 /home/tdemir/.ssh/authorized_keys
+
+      # Identify the network interfaces
+      FIRST_IF=$(ip -o link show | awk -F': ' '{print $2}' | grep -v lo | grep enp0s3)
+      SECOND_IF=$(ip -o link show | awk -F': ' '{print $2}' | grep -v lo | grep enp0s8)
+
+      # Create Netplan configuration
+      sudo bash -c "cat > /etc/netplan/02-eth1.yaml <<EOF
 network:
   version: 2
   renderer: networkd
   ethernets:
     eth0:
       match:
-        macaddress: $MAC_ENP0S3
+        name: $FIRST_IF
       set-name: eth0
       dhcp4: yes
     eth1:
       match:
-        macaddress: $MAC_ENP0S8
+        name: $SECOND_IF
       set-name: eth1
       dhcp4: no
       addresses:
         - 192.168.56.110/24
 EOF"
 
-      # Netplan yapılandırmasını uygula
+      # Apply Netplan configuration
       sudo netplan apply
 
-      # Kullanıcı oluştur ve SSH anahtarlarını ayarla
-      sudo useradd -m -s /bin/bash tdemir
-      echo 'tdemir ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/tdemir
-      echo 'tdemir:crea' | sudo chpasswd
-      sudo mkdir -p /home/tdemir/.ssh
-      sudo cp /home/vagrant/.ssh/authorized_keys /home/tdemir/.ssh/
-      sudo chown -R tdemir:tdemir /home/tdemir/.ssh
-      sudo chmod 700 /home/tdemir/.ssh
-      sudo chmod 600 /home/tdemir/.ssh/authorized_keys
+      # Restart network services to ensure changes take effect
+      sudo systemctl restart systemd-networkd
     SHELL
   end
 
@@ -61,47 +70,59 @@ EOF"
   config.vm.define "tdemirSW" do |worker|
     worker.vm.hostname = "tdemirSW"
 
-    # İlk ağ adaptörü NAT (enp0s3)
-    # İkinci ağ adaptörü private network (enp0s8)
+    # NAT interface
+    worker.vm.network "forwarded_port", guest: 22, host: 2200, auto_correct: true
+
+    # Private network
     worker.vm.network "private_network", ip: "192.168.56.111", auto_config: false, nic_type: "virtio", adapter: 2
 
+    # Provisioning
     worker.vm.provision "shell", inline: <<-SHELL
-      # MAC adreslerini al
-      MAC_ENP0S3=$(cat /sys/class/net/enp0s3/address)
-      MAC_ENP0S8=$(cat /sys/class/net/enp0s8/address)
+      # Update and install necessary packages
+      sudo apt-get update
+      sudo apt-get install -y net-tools
 
-      # Netplan yapılandırma dosyası oluştur
-      sudo bash -c "cat > /etc/netplan/01-netcfg.yaml <<EOF
+      # Create user 'tdemir'
+      sudo useradd -m -s /bin/bash tdemir
+      echo "tdemir ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/tdemir
+      echo "tdemir:crea" | sudo chpasswd
+
+      # Setup SSH for 'tdemir'
+      sudo mkdir -p /home/tdemir/.ssh
+      sudo cp /home/vagrant/.ssh/authorized_keys /home/tdemir/.ssh/authorized_keys
+      sudo chown -R tdemir:tdemir /home/tdemir/.ssh
+      sudo chmod 700 /home/tdemir/.ssh
+      sudo chmod 600 /home/tdemir/.ssh/authorized_keys
+
+      # Identify the network interfaces
+      FIRST_IF=$(ip -o link show | awk -F': ' '{print $2}' | grep -v lo | grep enp0s3)
+      SECOND_IF=$(ip -o link show | awk -F': ' '{print $2}' | grep -v lo | grep enp0s8)
+
+      # Create Netplan configuration
+      sudo bash -c "cat > /etc/netplan/02-eth1.yaml <<EOF
 network:
   version: 2
   renderer: networkd
   ethernets:
     eth0:
       match:
-        macaddress: $MAC_ENP0S3
+        name: $FIRST_IF
       set-name: eth0
       dhcp4: yes
     eth1:
       match:
-        macaddress: $MAC_ENP0S8
+        name: $SECOND_IF
       set-name: eth1
       dhcp4: no
       addresses:
         - 192.168.56.111/24
 EOF"
 
-      # Netplan yapılandırmasını uygula
+      # Apply Netplan configuration
       sudo netplan apply
 
-      # Kullanıcı oluştur ve SSH anahtarlarını ayarla
-      sudo useradd -m -s /bin/bash tdemir
-      echo 'tdemir ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/tdemir
-      echo 'tdemir:crea' | sudo chpasswd
-      sudo mkdir -p /home/tdemir/.ssh
-      sudo cp /home/vagrant/.ssh/authorized_keys /home/tdemir/.ssh/
-      sudo chown -R tdemir:tdemir /home/tdemir/.ssh
-      sudo chmod 700 /home/tdemir/.ssh
-      sudo chmod 600 /home/tdemir/.ssh/authorized_keys
+      # Restart network services to ensure changes take effect
+      sudo systemctl restart systemd-networkd
     SHELL
   end
 end
