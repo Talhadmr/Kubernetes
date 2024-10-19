@@ -1,57 +1,107 @@
 Vagrant.configure("2") do |config|
-  
-    # Ortak ayarlar
-    config.vm.box = "ubuntu/jammy64"
-    config.vm.provider "virtualbox" do |vb|
-      vb.memory = "1024"
-      vb.cpus = 1
-    end
-  
-    # SSH varsayılan kullanıcısını tdemir olarak ayarla
-    config.ssh.username = "tdemir"
-  
-    # Server Machine Configuration
-    config.vm.define "tdemirS" do |server|
-      server.vm.hostname = "tdemirS"
-      server.vm.network "private_network", ip: "192.168.56.110"
-  
-      server.vm.provision "shell", inline: <<-SHELL
-        # tdemir kullanıcısını oluştur
-        sudo useradd -m -s /bin/bash tdemir
-        echo "tdemir ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/tdemir
-  
-        # tdemir kullanıcısına şifre ver
-        echo "tdemir:crea" | sudo chpasswd
-  
-        # Vagrant varsayılan anahtarını tdemir kullanıcısına kopyala
-        sudo mkdir -p /home/tdemir/.ssh
-        sudo cp /home/vagrant/.ssh/authorized_keys /home/tdemir/.ssh/authorized_keys
-        sudo chown -R tdemir:tdemir /home/tdemir/.ssh
-        sudo chmod 700 /home/tdemir/.ssh
-        sudo chmod 600 /home/tdemir/.ssh/authorized_keys
-      SHELL
-    end
-  
-    # Server Worker Machine Configuration
-    config.vm.define "tdemirSW" do |serverworker|
-      serverworker.vm.hostname = "tdemirSW"
-      serverworker.vm.network "private_network", ip: "192.168.56.111"
-  
-      serverworker.vm.provision "shell", inline: <<-SHELL
-        # tdemir kullanıcısını oluştur
-        sudo useradd -m -s /bin/bash tdemir
-        echo "tdemir ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/tdemir
-  
-        # tdemir kullanıcısına şifre ver
-        echo "tdemir:crea" | sudo chpasswd
-  
-        # Vagrant varsayılan anahtarını tdemir kullanıcısına kopyala
-        sudo mkdir -p /home/tdemir/.ssh
-        sudo cp /home/vagrant/.ssh/authorized_keys /home/tdemir/.ssh/authorized_keys
-        sudo chown -R tdemir:tdemir /home/tdemir/.ssh
-        sudo chmod 700 /home/tdemir/.ssh
-        sudo chmod 600 /home/tdemir/.ssh/authorized_keys
-      SHELL
-    end
+  config.vm.box = "ubuntu/jammy64"
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "1024"
+    vb.cpus = 1
   end
-  
+
+  # SSH ayarlarını kaldır
+  # config.ssh.username = "tdemir"
+
+  # Server Machine Configuration
+  config.vm.define "tdemirS" do |server|
+    server.vm.hostname = "tdemirS"
+
+    # İlk ağ adaptörü NAT (enp0s3)
+    # İkinci ağ adaptörü private network (enp0s8)
+    server.vm.network "private_network", ip: "192.168.56.110", auto_config: false, nic_type: "virtio", adapter: 2
+
+    server.vm.provision "shell", inline: <<-SHELL
+      # MAC adreslerini al
+      MAC_ENP0S3=$(cat /sys/class/net/enp0s3/address)
+      MAC_ENP0S8=$(cat /sys/class/net/enp0s8/address)
+
+      # Netplan yapılandırma dosyası oluştur
+      sudo bash -c "cat > /etc/netplan/01-netcfg.yaml <<EOF
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eth0:
+      match:
+        macaddress: $MAC_ENP0S3
+      set-name: eth0
+      dhcp4: yes
+    eth1:
+      match:
+        macaddress: $MAC_ENP0S8
+      set-name: eth1
+      dhcp4: no
+      addresses:
+        - 192.168.56.110/24
+EOF"
+
+      # Netplan yapılandırmasını uygula
+      sudo netplan apply
+
+      # Kullanıcı oluştur ve SSH anahtarlarını ayarla
+      sudo useradd -m -s /bin/bash tdemir
+      echo 'tdemir ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/tdemir
+      echo 'tdemir:crea' | sudo chpasswd
+      sudo mkdir -p /home/tdemir/.ssh
+      sudo cp /home/vagrant/.ssh/authorized_keys /home/tdemir/.ssh/
+      sudo chown -R tdemir:tdemir /home/tdemir/.ssh
+      sudo chmod 700 /home/tdemir/.ssh
+      sudo chmod 600 /home/tdemir/.ssh/authorized_keys
+    SHELL
+  end
+
+  # Worker Machine Configuration
+  config.vm.define "tdemirSW" do |worker|
+    worker.vm.hostname = "tdemirSW"
+
+    # İlk ağ adaptörü NAT (enp0s3)
+    # İkinci ağ adaptörü private network (enp0s8)
+    worker.vm.network "private_network", ip: "192.168.56.111", auto_config: false, nic_type: "virtio", adapter: 2
+
+    worker.vm.provision "shell", inline: <<-SHELL
+      # MAC adreslerini al
+      MAC_ENP0S3=$(cat /sys/class/net/enp0s3/address)
+      MAC_ENP0S8=$(cat /sys/class/net/enp0s8/address)
+
+      # Netplan yapılandırma dosyası oluştur
+      sudo bash -c "cat > /etc/netplan/01-netcfg.yaml <<EOF
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eth0:
+      match:
+        macaddress: $MAC_ENP0S3
+      set-name: eth0
+      dhcp4: yes
+    eth1:
+      match:
+        macaddress: $MAC_ENP0S8
+      set-name: eth1
+      dhcp4: no
+      addresses:
+        - 192.168.56.111/24
+EOF"
+
+      # Netplan yapılandırmasını uygula
+      sudo netplan apply
+
+      # Kullanıcı oluştur ve SSH anahtarlarını ayarla
+      sudo useradd -m -s /bin/bash tdemir
+      echo 'tdemir ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/tdemir
+      echo 'tdemir:crea' | sudo chpasswd
+      sudo mkdir -p /home/tdemir/.ssh
+      sudo cp /home/vagrant/.ssh/authorized_keys /home/tdemir/.ssh/
+      sudo chown -R tdemir:tdemir /home/tdemir/.ssh
+      sudo chmod 700 /home/tdemir/.ssh
+      sudo chmod 600 /home/tdemir/.ssh/authorized_keys
+    SHELL
+  end
+end
