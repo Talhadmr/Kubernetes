@@ -1,8 +1,16 @@
 Vagrant.configure("2") do |config|
+    # this will install the plugin if it's not already installed
+    # I added this line to make sure the plugin is installed
+    if Vagrant.has_plugin? "vagrant-vbguest"
+      config.vbguest.no_install  = true
+    end
+
+    # cofiguration for the virtual machines
     BOX_NAME = "debian/bookworm64" # Debian 12
     VM_MEMORY = 1024
     VM_CPUS = 1
     
+    # configuration for the master
     config.vm.define "tdemirS" do |server|
       server.vm.box = BOX_NAME
       server.vm.hostname = "tdemirS"
@@ -16,6 +24,7 @@ Vagrant.configure("2") do |config|
       SHELL
     end
   
+    # configuration for the worker
     config.vm.define "tdemirSW" do |server_worker|
       server_worker.vm.box = BOX_NAME
       server_worker.vm.hostname = "tdemirSW"
