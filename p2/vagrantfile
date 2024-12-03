@@ -1,15 +1,26 @@
 Vagrant.configure("2") do |config|
-    config.vm.box = "debian/bookworm64"
-    config.vm.hostname = "tdemirS"
-    
-    config.vm.network "private_network", ip: "192.168.56.110"
-    
-    config.vm.provider "virtualbox" do |vb|
-      vb.memory = 512
-      vb.cpus = 1
+  # this will install the plugin if it's not already installed
+  # I added this line to make sure the plugin is installed
+  if Vagrant.has_plugin? "vagrant-vbguest"
+    config.vbguest.no_install  = true
+  end
+
+  # cofiguration for the virtual machines
+  BOX_NAME = "debian/bookworm64" # Debian 12
+  VM_MEMORY = 1024
+  VM_CPUS = 1
+  
+  # configuration for the master
+  config.vm.define "tdemirS" do |server|
+    server.vm.box = BOX_NAME
+    server.vm.hostname = "tdemirS"
+    server.vm.network "private_network", ip: "192.168.56.110"
+    server.vm.provider "virtualbox" do |vb|
+      vb.memory = VM_MEMORY
+      vb.cpus = VM_CPUS
     end
-    
-    config.vm.provision "shell", inline: <<-SHELL
-      curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--write-kubeconfig-mode=644" sh -
+    server.vm.provision "shell", inline: <<-SHELL
+      bash /vagrant/scripts/server.sh
     SHELL
   end
+end
