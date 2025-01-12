@@ -1,0 +1,111 @@
+/* Genel yapı */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Hero (üst kısım) */
+.hero {
+    position: relative;
+    height: 100vh;
+    background: url('https://source.unsplash.com/1920x1080/?cloud,technology') no-repeat center center/cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    overflow: hidden;
+}
+
+.hero .overlay {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 10px;
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+.hero h1 {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.8);
+}
+
+.hero p {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    color: #e3e3e3;
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 0.8rem 2rem;
+    font-size: 1.2rem;
+    color: white;
+    background: linear-gradient(120deg, #6a11cb, #2575fc);
+    border: none;
+    border-radius: 50px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.cta-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Kubernetes bilgi bölümü */
+#kubernetes-info, #how-kubernetes-works {
+    padding: 3rem 2rem;
+    text-align: center;
+    background: #f8f9fa;
+    color: #333;
+}
+
+#kubernetes-info h2, #how-kubernetes-works h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+#kubernetes-info p, #how-kubernetes-works p {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+}
+
+.k8s-logo {
+    width: 150px;
+    margin-top: 1rem;
+}
+
+.k8s-cluster {
+    width: 80%;
+    margin-top: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Footer */
+footer {
+    background: #333;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.credit {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: white;
+    text-align: center;
+}

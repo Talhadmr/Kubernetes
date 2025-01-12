@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
       - name: app3
-        image: nginx:latest
+        image: talhadmr/kub3:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 80
 ---

@@ -1,0 +1,48 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #333;
+    background: linear-gradient(to right, #ffffff, #ccccff);
+}
+
+.hero {
+    height: 100vh;
+    background: url('https://source.unsplash.com/1920x1080/?technology') no-repeat center center/cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    position: relative;
+}
+
+.hero .overlay {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.cta-button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.cta-button:hover {
+    background-color: #45a049;
+}
+.credit {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: white;
+}
