@@ -9,13 +9,14 @@ echo 'alias k="kubectl"' >> /home/vagrant/.bashrc
 /usr/local/bin/kubectl apply -f /vagrant/manifest/app2-deployment.yaml
 /usr/local/bin/kubectl apply -f /vagrant/manifest/app3-deployment.yaml
 /usr/local/bin/kubectl apply -f /vagrant/manifest/ingress.yaml
-#!/bin/bash
-sudo apt update
+
+wget https://github.com/derailed/k9s/releases/latest/download/k9s_Linux_amd64.tar.gz
+tar -xvf k9s_Linux_amd64.tar.gz
+sudo mv k9s /usr/local/bin/
+
 sudo apt install -y make
-sudo apt install -y curl
 curl -sfL https://get.k3s.io | sh -
 echo "Updating package index..."
-sudo apt-get update -y
 
 echo "Installing required packages for Docker..."
 sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common

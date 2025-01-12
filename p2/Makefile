@@ -38,3 +38,7 @@ get-services:
 	@echo "Getting services..."
 	sudo kubectl get services 
 
+k9:
+	@echo "Starting k9s..."
+	k9s --kubeconfig /etc/rancher/k3s/k3s.yaml
+	

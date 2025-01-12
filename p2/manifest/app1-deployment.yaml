@@ -20,6 +20,7 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 80
+
 ---
 apiVersion: v1
 kind: Service
@@ -32,5 +33,4 @@ spec:
   - protocol: TCP
     port: 80
     targetPort: 80
-  # type: ClusterIP
-  clusterIP: 10.43.171.213
+  type: ClusterIP
