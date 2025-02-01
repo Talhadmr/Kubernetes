@@ -8,9 +8,22 @@ sudo apt update && sudo apt upgrade -y
 echo "📚 Installing required packages..."
 sudo apt-get install -y curl
 
-# Install K3s
-echo "🚀 Installing K3s..."
-curl -sfL https://get.k3s.io | sh -
+# Fonksiyon: kubectl kurulumu
+install_kubectl() {
+  echo "kubectl bulunamadı. kubectl kuruluyor..."
+
+  # En son kararlı sürümü belirle ve indir
+  KUBECTL_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt)
+  curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+  
+  # İndirdikten sonra çalıştırılabilir yap ve sistem dizinine taşı
+  sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+  
+  # Geçici dosyayı sil
+  rm kubectl
+  
+  echo "kubectl kurulumu tamamlandı."
+}
 
 # Install Docker
 if ! command -v docker &> /dev/null; then
@@ -46,16 +59,16 @@ k3d cluster create mycluster -p "8888:8888@loadbalancer"
 # k3d cluster create iot-cluster --api-port 6443 -p 8080:80@loadbalancer --agents 2 --wait
 
 
+
 kubectl create namespace argocd
 kubectl create namespace dev
 
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
-# Install Argo CD CLI
-echo "🚀 Installing Argo CD CLI..."
-curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
-# kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
-rm argocd-linux-amd64
+#kubectl port-forward svc/argocd-server -n argocd 8080:443
+
+#kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
+
 
 echo "✅ Installation complete! Please log out and log back in for docker group changes to take effect."
 

@@ -32,5 +32,5 @@ spec:
   - protocol: TCP
     port: 80
     targetPort: 80
-  # type: ClusterIP
-  clusterIP: 10.43.229.156
+  type: ClusterIP
+  #clusterIP: 10.43.229.156
