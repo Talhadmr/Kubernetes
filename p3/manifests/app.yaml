@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: "https://github.com/Talhadmr/Kubernetes"  # GitHub repo URL'si
+    repoURL: "https://github.com/Talhadmr/Kubernetes"
     targetRevision: HEAD
     path: .
   destination:

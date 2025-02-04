@@ -53,17 +53,7 @@ fi
 echo "🚢 Installing K3d..."
 wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
 
-# Create K3d cluster
-echo "🎯 Creating K3d cluster..."
-k3d cluster create mycluster -p "8888:8888@loadbalancer"
-# k3d cluster create iot-cluster --api-port 6443 -p 8080:80@loadbalancer --agents 2 --wait
-
-
-
-kubectl create namespace argocd
-kubectl create namespace dev
-
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+#kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
 #kubectl port-forward svc/argocd-server -n argocd 8080:443
 
