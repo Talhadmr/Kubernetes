@@ -1,9 +1,8 @@
 #!/bin/bash
 
 export PATH=/usr/local/bin:$PATH
-export KUBECONFIG=~/.kube/config
+export KUBECONFIG=$(k3d kubeconfig write bonusCluster)
 
-curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 helm repo add --insecure-skip-tls-verify gitlab https://charts.gitlab.io
 helm repo update
 
