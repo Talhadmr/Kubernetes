@@ -1,0 +1,24 @@
+Vagrant.configure("2") do |config|
+    if Vagrant.has_plugin? "vagrant-vbguest"
+      config.vbguest.no_install  = true
+    end
+  
+    BOX_NAME = "debian/bookworm64"
+    VM_MEMORY = 4096
+    VM_CPUS = 2
+    
+    config.vm.define "bonus" do |server|
+      server.vm.box = BOX_NAME
+      server.vm.hostname = "bonus"
+      server.vm.network "private_network", ip: "192.168.56.110"
+      server.vm.provider "virtualbox" do |vb|
+        vb.memory = VM_MEMORY
+        vb.cpus = VM_CPUS
+      end
+      server.vm.provision "shell", inline: <<-SHELL
+        bash /vagrant/scripts/init.sh
+        bash /vagrant/scripts/gitlab_init.sh
+      SHELL
+    end
+  end
+  

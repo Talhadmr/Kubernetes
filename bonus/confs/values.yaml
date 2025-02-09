@@ -1,0 +1,10 @@
+global:
+  hosts:
+    domain: localhost
+  ingress:
+    enabled: false
+    configureCertmanager: false
+certmanager:
+  install: false
+gitlab-runner:
+  install: false
