@@ -8,11 +8,8 @@ spec:
   source:
     repoURL: "https://github.com/Talhadmr/Kubernetes"
     targetRevision: HEAD
-    path: .
+    path: p3/manifests/
   destination:
     server: https://kubernetes.default.svc
     namespace: dev
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
+  syncPolicy: {}

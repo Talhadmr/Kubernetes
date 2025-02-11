@@ -53,18 +53,21 @@ fi
 echo "🚢 Installing K3d..."
 wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
 
-#kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+# cluster create
+k3d cluster create argocd-p3-cluster
 
-#kubectl port-forward svc/argocd-server -n argocd 8080:443
+kubectl create namespace argocd
+kubectl create namespace dev
 
-#kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
+# argocd apply
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl wait --for=condition=ready pod --all -n argocd --timeout=300s
 
+# app apply
+kubectl apply -n argocd -f manifests/app.yaml
+# kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
+echo -n "ArgoCD Admin Password: "
+kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 --decode
+echo
 
-echo "✅ Installation complete! Please log out and log back in for docker group changes to take effect."
-
-# Verify installations
-echo "🔍 Verifying installations..."
-docker --version
-kubectl version --client
-k3d --version
-argocd version --client
+kubectl port-forward svc/argocd-server -n argocd 8080:443
