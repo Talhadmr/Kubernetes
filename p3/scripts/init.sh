@@ -8,29 +8,16 @@ sudo apt update && sudo apt upgrade -y
 echo "📚 Installing required packages..."
 sudo apt-get install -y curl
 
-# Fonksiyon: kubectl kurulumu
-install_kubectl() {
-  echo "kubectl bulunamadı. kubectl kuruluyor..."
-
-  # En son kararlı sürümü belirle ve indir
-  KUBECTL_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt)
-  curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
-  
-  # İndirdikten sonra çalıştırılabilir yap ve sistem dizinine taşı
-  sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-  
-  # Geçici dosyayı sil
-  rm kubectl
-  
-  echo "kubectl kurulumu tamamlandı."
-}
+# kubectl
+curl -L "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" --output /tmp/kubectl
+sudo install -o root -g root -m 0755 /tmp/kubectl /usr/local/bin/kubectl
 
 # Install Docker
 if ! command -v docker &> /dev/null; then
     echo "🐳 Docker is not installed. Installing Docker on Debian..."
     # Add Docker's official GPG key:
     sudo apt-get update
-    sudo apt-get install ca-certificates curl
+    sudo apt-get install ca-certificates curl -y
     sudo install -m 0755 -d /etc/apt/keyrings
     sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
     sudo chmod a+r /etc/apt/keyrings/docker.asc
@@ -40,10 +27,11 @@ if ! command -v docker &> /dev/null; then
     $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
     sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
     sudo apt-get update
-    sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 
     # Add user to docker group
     sudo usermod -aG docker $USER
+    newgrp docker
     echo "✅ Docker installation complete. You may need to log out and log back in to use Docker without sudo."
 else
     echo "🐳 Docker is already installed."
