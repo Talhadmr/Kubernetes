@@ -53,6 +53,8 @@ kubectl wait --for=condition=ready pod --all -n argocd --timeout=300s
 
 # app apply
 kubectl apply -n argocd -f manifests/app.yaml
+kubectl apply -n dev -f manifests/deployment.yaml
+kubectl apply -n dev -f manifests/service.yaml
 # kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
 echo -n "ArgoCD Admin Password: "
 kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 --decode

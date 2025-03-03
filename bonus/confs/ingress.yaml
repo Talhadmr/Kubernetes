@@ -2,12 +2,10 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ingress-gitlab
-  namespace: gitlab
+  name: gitlab-argocd-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+      ingressClassName: traefik   # NGINX yerine Traefik kullanıyoruz
 spec:
-  ingressClassName: nginx
   rules:
   - host: gitlab.local
     http:
@@ -16,20 +14,9 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: gitlab-webservice-default
+            name: gitlab-webservice
             port:
               number: 80
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: ingress-argocd
-  namespace: argocd
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-spec:
-  ingressClassName: nginx
-  rules:
   - host: argocd.local
     http:
       paths:
