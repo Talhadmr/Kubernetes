@@ -6,13 +6,10 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: "http://gitlab-webservice-default.gitlab.svc.cluster.local:8181/root/inception.git"
+    repoURL: "https://github.com/Talhadmr/Kubernetes"
     targetRevision: HEAD
-    path: .
+    path: p3/manifests/
   destination:
     server: https://kubernetes.default.svc
     namespace: dev
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
+  syncPolicy: {}

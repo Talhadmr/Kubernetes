@@ -8,7 +8,7 @@ helm repo update
 
 kubectl get namespace gitlab || kubectl create namespace gitlab
 
-helm install --insecure-skip-tls-verify gitlab gitlab/gitlab --namespace gitlab -f ../confs/values.yaml
+helm install --insecure-skip-tls-verify gitlab gitlab/gitlab --namespace gitlab -f /vagrant/confs/values.yaml
 kubectl wait --for=condition=ready pod --all --namespace gitlab --timeout=600s
 
 # GitLab Pod durumlarını kontrol ediyoruz hazır olduğunda ingress çalıştırılacak

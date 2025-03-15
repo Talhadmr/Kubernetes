@@ -64,14 +64,12 @@ kubectl create namespace argocd
 kubectl create namespace dev
 
 kubectl apply --namespace argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-echo "*****************************************************"
 sleep 10
 kubectl wait --for=condition=ready pod --all -n argocd --timeout=300s
 
-
-kubectl apply -n argocd -f ../confs/app.yaml
-kubectl apply -n dev -f ../confs/dev/deployment.yaml
-kubectl apply -n dev -f ../confs/dev/service.yaml
+kubectl apply -n argocd -f /vagrant/confs/app.yaml
+kubectl apply -n dev -f /vagrant/confs/dev/deployment.yaml
+kubectl apply -n dev -f /vagrant/confs/dev/service.yaml
 
 echo -n "ArgoCD Admin Password: "
 kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 --decode

@@ -85,4 +85,5 @@ fi
 # 🎉 Her şey tamam, Ingress deploy edilebilir
 echo -e "${GREEN}🚀 Ingress için uygun ortam hazır! Şimdi 'kubectl apply -f ingress.yaml' çalıştırıyorum...${NC}"
 
-kubectl apply -f ../confs/ingress.yaml
+kubectl apply -f /vagrant/confs/argocd-ingress.yaml
+kubectl apply -f /vagrant/confs/gitlab-ingress.yaml
